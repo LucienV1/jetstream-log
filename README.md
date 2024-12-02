@@ -19,7 +19,7 @@ This program subscribes to the atproto jetstream, and logs all events by default
 1. Clone the repository:
 
     ```sh
-    git clone https://github.com/yourusername/jetstream-log.git
+    git clone https://github.com/LucienV1/jetstream-log.git
     cd jetstream-log
     ```
 
