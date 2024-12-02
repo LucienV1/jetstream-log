@@ -20,5 +20,10 @@
 # Go workspace file
 go.work
 
-# Ignore all .sqlite files
+# Ignore all sql files
 *.sqlite
+*.db
+*.sql
+*.psql
+!schema.psql
+/cli-output
