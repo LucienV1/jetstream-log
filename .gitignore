@@ -25,5 +25,6 @@ go.work
 *.db
 *.sql
 *.psql
+*.sqlite-journal
 !schema.psql
 /cli-output

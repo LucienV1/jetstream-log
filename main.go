@@ -38,12 +38,12 @@ func separator(s string) []string {
 	return ret
 }
 func eventHandler(ctx context.Context, e *models.Event) error {
-    id, err := uuid.NewV7()
-    if err != nil {
-        log.Fatal(err)
-    }
+	id, err := uuid.NewV7()
+	if err != nil {
+		log.Fatal(err)
+	}
 
-    query := `
+	query := `
         INSERT INTO Event (
             InternalID, Did, TimeUS, Kind, 
             CommitRev, CommitOperation, CommitCollection, CommitRKey, CommitRecord, CommitCID, 
@@ -52,63 +52,63 @@ func eventHandler(ctx context.Context, e *models.Event) error {
         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
     `
 
-    var (
-        commitRev, commitOperation, commitCollection, commitRKey, commitCID string
-        commitRecord                                                       []byte
-        accountActive                                                      bool
-        accountDid, accountStatus, accountTime                             string
-        accountSeq                                                         int64
-        identityDid, identityHandle, identityTime                          string
-        identitySeq                                                        int64
-    )
+	var (
+		commitRev, commitOperation, commitCollection, commitRKey, commitCID string
+		commitRecord                                                        []byte
+		accountActive                                                       bool
+		accountDid, accountStatus, accountTime                              string
+		accountSeq                                                          int64
+		identityDid, identityHandle, identityTime                           string
+		identitySeq                                                         int64
+	)
 
-    if e.Commit != nil {
-        commitRev = e.Commit.Rev
-        commitOperation = e.Commit.Operation
-        commitCollection = e.Commit.Collection
-        commitRKey = e.Commit.RKey
-        commitRecord = e.Commit.Record
-        commitCID = e.Commit.CID
-    }
+	if e.Commit != nil {
+		commitRev = e.Commit.Rev
+		commitOperation = e.Commit.Operation
+		commitCollection = e.Commit.Collection
+		commitRKey = e.Commit.RKey
+		commitRecord = e.Commit.Record
+		commitCID = e.Commit.CID
+	}
 
-    if e.Account != nil {
-        accountActive = e.Account.Active
-        accountDid = e.Account.Did
-        accountSeq = e.Account.Seq
-        if e.Account.Status != nil {
-            accountStatus = *e.Account.Status
-        }
-        accountTime = e.Account.Time
-    }
+	if e.Account != nil {
+		accountActive = e.Account.Active
+		accountDid = e.Account.Did
+		accountSeq = e.Account.Seq
+		if e.Account.Status != nil {
+			accountStatus = *e.Account.Status
+		}
+		accountTime = e.Account.Time
+	}
 
-    if e.Identity != nil {
-        identityDid = e.Identity.Did
-        if e.Identity.Handle != nil {
-            identityHandle = *e.Identity.Handle
-        }
-        identitySeq = e.Identity.Seq
-        identityTime = e.Identity.Time
-    }
+	if e.Identity != nil {
+		identityDid = e.Identity.Did
+		if e.Identity.Handle != nil {
+			identityHandle = *e.Identity.Handle
+		}
+		identitySeq = e.Identity.Seq
+		identityTime = e.Identity.Time
+	}
 
-    args := []interface{}{
-        id, e.Did, e.TimeUS, e.Kind,
-        commitRev, commitOperation, commitCollection, commitRKey, commitRecord, commitCID,
-        accountActive, accountDid, accountSeq, accountStatus, accountTime,
-        identityDid, identityHandle, identitySeq, identityTime,
-    }
+	args := []interface{}{
+		id, e.Did, e.TimeUS, e.Kind,
+		commitRev, commitOperation, commitCollection, commitRKey, commitRecord, commitCID,
+		accountActive, accountDid, accountSeq, accountStatus, accountTime,
+		identityDid, identityHandle, identitySeq, identityTime,
+	}
 
-    if *dbtype == "sqlite" {
-        _, err := connlite.Exec(query, args...)
-        if err != nil {
-            log.Fatal(err)
-        }
-    } else if *dbtype == "postgres" {
-        _, err := connpsql.Exec(ctx, query, args...)
-        if err != nil {
-            log.Fatal(err)
-        }
-    }
-    return nil
+	if *dbtype == "sqlite" {
+		_, err := connlite.Exec(query, args...)
+		if err != nil {
+			log.Fatal(err)
+		}
+	} else if *dbtype == "postgres" {
+		_, err := connpsql.Exec(ctx, query, args...)
+		if err != nil {
+			log.Fatal(err)
+		}
+	}
+	return nil
 }
 func main() {
 	dbtype = flag.String("t", "sqlite", "database type (sqlite, postgres)")
@@ -130,7 +130,7 @@ func main() {
 	com := slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{})
 	sl := slog.New(com)
 	//ctx := context.Background()
-	sch := parallel.NewScheduler(2, "bgcat", sl, eventHandler)
+	sch := parallel.NewScheduler(1, "bgcat", sl, eventHandler)
 	jsclient, err := client.NewClient(
 		&client.ClientConfig{
 			Compress:          true,
